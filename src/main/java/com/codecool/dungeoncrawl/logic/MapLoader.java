@@ -18,9 +18,12 @@ public class MapLoader {
         GameMap map = new GameMap(width, height, CellType.EMPTY);
         for (int y = 0; y < height; y++) {
             String line = scanner.nextLine();
+
             for (int x = 0; x < width; x++) {
+
                 if (x < line.length()) {
                     Cell cell = map.getCell(x, y);
+
                     switch (line.charAt(x)) {
                         case ' ':
                             cell.setType(CellType.EMPTY);
