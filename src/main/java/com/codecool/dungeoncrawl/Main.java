@@ -9,14 +9,19 @@ import com.codecool.dungeoncrawl.logic.actors.Scorpion;
 import com.codecool.dungeoncrawl.logic.actors.Skeleton;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -36,12 +41,39 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        Stage popup = new Stage();
+
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Enter your name");
+
+        Label nameLabel = new Label("Name: ");
+        TextField textField = new TextField();
+        Button submit = new Button("Submit");
+
+        submit.setOnAction(e -> {
+            map.getPlayer().setName(textField.getText());
+            popup.close();
+        });
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(nameLabel, textField, submit);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene popUpScene = new Scene(layout, 500, 400);
+        popup.setScene(popUpScene);
+        popup.showAndWait();
+
+        // #########################
+
         GridPane ui = new GridPane();
         ui.setPrefWidth(200);
         ui.setPadding(new Insets(10));
 
-        ui.add(new Label("Health: "), 0, 0);
-        ui.add(healthLabel, 1, 0);
+        ui.add(new Label("Player: " + map.getPlayer().getName()), 0, 0);
+
+        ui.add(new Label("Health: "), 0, 1);
+        ui.add(healthLabel, 1, 1);
 
         BorderPane borderPane = new BorderPane();
 
@@ -55,6 +87,7 @@ public class Main extends Application {
 
         primaryStage.setTitle("Dungeon Crawl");
         primaryStage.show();
+
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {

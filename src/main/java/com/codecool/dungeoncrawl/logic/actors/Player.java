@@ -4,6 +4,7 @@ import com.codecool.dungeoncrawl.logic.Cell;
 
 public class Player extends Actor {
 //    private int attack = 2;
+    private String name;
 
     public Player(Cell cell) {
         super(cell);
@@ -20,4 +21,13 @@ public class Player extends Actor {
 //    public void setAttack(int attack) {
 //        this.attack = attack;
 //    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
