@@ -2,28 +2,23 @@ package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
+import com.codecool.dungeoncrawl.logic.GameMap;
 
-public class Skeleton extends Actor {
-    private static int direction = -1;
+public class Enemy extends Actor {
 
-    public Skeleton(Cell cell) {
+    public Enemy(Cell cell) {
         super(cell);
     }
 
     @Override
     public String getTileName() {
-        return "skeleton";
+        return "enemy";
     }
 
     @Override
     public void move(int dx, int dy) {
-
         Cell cell = this.getCell();
-        Cell nextCell = cell.getNeighbor(dx * direction, dy * direction);
-        if (!(nextCell.getType() == CellType.FLOOR)) {
-            direction *= -1;
-            nextCell = cell.getNeighbor(dx * direction, dy * direction);
-        }
+        Cell nextCell = cell.getNeighbor(dx, dy);
         if (nextCell.getType() == CellType.FLOOR && nextCell.getActor() == null) {
             cell.setActor(null);
             nextCell.setActor(this);

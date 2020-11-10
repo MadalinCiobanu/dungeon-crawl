@@ -1,6 +1,10 @@
 package com.codecool.dungeoncrawl.logic;
 
+import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameMap {
     private int width;
@@ -30,6 +34,21 @@ public class GameMap {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public List<Actor> getEnemies() {
+        List<Actor> enemies = new ArrayList<>();
+
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells[i].length; j++) {
+                Actor cellActor = cells[i][j].getActor();
+                if ((cellActor != null) && !(cellActor instanceof Player)) {
+                    enemies.add(cellActor);
+                }
+            }
+        }
+
+        return enemies;
     }
 
     public int getWidth() {

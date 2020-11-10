@@ -3,6 +3,10 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
+import com.codecool.dungeoncrawl.logic.actors.Actor;
+import com.codecool.dungeoncrawl.logic.actors.Enemy;
+import com.codecool.dungeoncrawl.logic.actors.Scorpion;
+import com.codecool.dungeoncrawl.logic.actors.Skeleton;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -14,6 +18,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Main extends Application {
     GameMap map = MapLoader.loadMap();
@@ -51,6 +58,8 @@ public class Main extends Application {
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
+        moveEnemies();
+
         switch (keyEvent.getCode()) {
             case UP:
                 map.getPlayer().move(0, -1);
@@ -68,6 +77,32 @@ public class Main extends Application {
                 map.getPlayer().move(1,0);
                 refresh();
                 break;
+        }
+    }
+
+    private void moveEnemies() {
+        List<Actor> enemies = map.getEnemies();
+        for (Actor e : enemies) {
+            if (e instanceof Enemy) {
+                int enemyDx = 0;
+                if (map.getPlayer().getX() < e.getX())
+                    enemyDx = -1;
+                else if (map.getPlayer().getX() > e.getX())
+                    enemyDx = 1;
+
+                int enemyDy = 0;
+                if (map.getPlayer().getY() < e.getY())
+                    enemyDy = -1;
+                else if (map.getPlayer().getY() > e.getY())
+                    enemyDy = 1;
+                e.move(enemyDx, enemyDy);
+            } else if (e instanceof Scorpion) {
+                int scorpionDx = ThreadLocalRandom.current().nextInt(-1, 2);
+                int scorpionDy = ThreadLocalRandom.current().nextInt(-1, 2);
+                e.move(scorpionDx, scorpionDy);
+            } else if (e instanceof Skeleton) {
+                e.move(-1, 0);
+            }
         }
     }
 
