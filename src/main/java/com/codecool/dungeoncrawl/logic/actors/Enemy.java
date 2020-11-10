@@ -5,6 +5,8 @@ import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.GameMap;
 
 public class Enemy extends Actor {
+    private int health = 3;
+    private int attack = 1;
 
     public Enemy(Cell cell) {
         super(cell);
@@ -24,5 +26,23 @@ public class Enemy extends Actor {
             nextCell.setActor(this);
             setCell(nextCell);
         }
+    }
+
+    @Override
+    public int getHealth() {
+        return health;
+    }
+
+    @Override
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getAttack() {
+        return attack;
+    }
+
+    public void setAttack(int attack) {
+        this.attack = attack;
     }
 }

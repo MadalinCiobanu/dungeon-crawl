@@ -5,6 +5,8 @@ import com.codecool.dungeoncrawl.logic.CellType;
 
 public class Skeleton extends Actor {
     private static int direction = -1;
+    private int health = 1;
+    private int attack = 1;
 
     public Skeleton(Cell cell) {
         super(cell);
@@ -29,5 +31,23 @@ public class Skeleton extends Actor {
             nextCell.setActor(this);
             setCell(nextCell);
         }
+    }
+
+    @Override
+    public int getHealth() {
+        return health;
+    }
+
+    @Override
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getAttack() {
+        return attack;
+    }
+
+    public void setAttack(int attack) {
+        this.attack = attack;
     }
 }
