@@ -35,6 +35,9 @@ public class Main extends Application {
             map.getHeight() * Tiles.TILE_WIDTH);
     GraphicsContext context = canvas.getGraphicsContext2D();
     Label healthLabel = new Label();
+    Label inventoryItems = new Label();
+    Label nameLabel = new Label();
+    Button pickUpButton = new Button("Pick Up");
 
     public static void main(String[] args) {
         launch(args);
@@ -70,10 +73,24 @@ public class Main extends Application {
         GridPane ui = new GridPane();
         ui.setPrefWidth(200);
         ui.setPadding(new Insets(10));
+        ui.setVgap(10);
 
-        ui.add(new Label("Player: " + map.getPlayer().getName()), 0, 0);
+        nameLabel.setText(map.getPlayer().getName());
+
+        pickUpButton.setOnAction(e -> {
+            map.getPlayer().addToInventory(map.getPlayer().getCell().getItem().getTileName());
+            map.getPlayer().getCell().getItem().pickItem();
+            refresh();
+            pickUpButton.setVisible(false);
+        });
+
+        ui.add(new Label("Player: "), 0, 0);
+        ui.add(nameLabel, 1, 0);
         ui.add(new Label("Health: "), 0, 1);
         ui.add(healthLabel, 1, 1);
+        ui.add(new Label("Inventory:"), 0, 5);
+        ui.add(inventoryItems, 0, 6);
+        ui.add(pickUpButton, 1, 53);
 
         BorderPane borderPane = new BorderPane();
 
@@ -155,7 +172,17 @@ public class Main extends Application {
             }
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
+        inventoryItems.setText(map.getPlayer().seeInventory().toString());
+        getPickUpButton();
         changeLevel();
+    }
+
+    private void getPickUpButton () {
+        if (map.getPlayer().onItem) {
+            pickUpButton.setVisible(true);
+        } else {
+            pickUpButton.setVisible(false);
+        }
     }
 
     private void changeLevel() {

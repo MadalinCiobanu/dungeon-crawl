@@ -12,7 +12,7 @@ public abstract class Item implements Drawable {
     }
 
     public void pickItem() {
-
+        this.cell.setItem(null);
     }
 
     public int getX() {
