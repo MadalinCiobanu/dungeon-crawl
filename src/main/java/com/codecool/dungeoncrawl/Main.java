@@ -37,6 +37,7 @@ public class Main extends Application {
     Label healthLabel = new Label();
     Label inventoryItems = new Label();
     Label nameLabel = new Label();
+    Label attackLabel = new Label();
     Button pickUpButton = new Button("Pick Up");
 
     public static void main(String[] args) {
@@ -88,6 +89,8 @@ public class Main extends Application {
         ui.add(nameLabel, 1, 0);
         ui.add(new Label("Health: "), 0, 1);
         ui.add(healthLabel, 1, 1);
+        ui.add(new Label("Attack: "), 0, 2);
+        ui.add(attackLabel, 1, 2);
         ui.add(new Label("Inventory:"), 0, 5);
         ui.add(inventoryItems, 0, 6);
         ui.add(pickUpButton, 1, 53);
@@ -172,6 +175,7 @@ public class Main extends Application {
             }
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
+        attackLabel.setText("" + map.getPlayer().getAttack());
         inventoryItems.setText(map.getPlayer().seeInventory().toString());
         getPickUpButton();
         changeLevel();
