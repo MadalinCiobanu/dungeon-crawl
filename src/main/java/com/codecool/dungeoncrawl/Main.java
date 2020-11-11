@@ -3,10 +3,10 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
-import com.codecool.dungeoncrawl.logic.actors.Actor;
-import com.codecool.dungeoncrawl.logic.actors.Enemy;
-import com.codecool.dungeoncrawl.logic.actors.Scorpion;
-import com.codecool.dungeoncrawl.logic.actors.Skeleton;
+import com.codecool.dungeoncrawl.logic.actors.*;
+import com.codecool.dungeoncrawl.logic.items.DoorDown;
+import com.codecool.dungeoncrawl.logic.items.DoorUp;
+import com.codecool.dungeoncrawl.logic.items.Key;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Main extends Application {
-    GameMap map = MapLoader.loadMap();
+    int level = 1;
+    GameMap map = MapLoader.loadMap("/map.txt");
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -71,7 +72,6 @@ public class Main extends Application {
         ui.setPadding(new Insets(10));
 
         ui.add(new Label("Player: " + map.getPlayer().getName()), 0, 0);
-
         ui.add(new Label("Health: "), 0, 1);
         ui.add(healthLabel, 1, 1);
 
@@ -155,5 +155,15 @@ public class Main extends Application {
             }
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
+        changeLevel();
+    }
+
+    private void changeLevel() {
+        if (map.getPlayer().getCell().getItem() instanceof DoorDown) {
+            map = MapLoader.loadMap("/map1.txt");
+        } else if (map.getPlayer().getCell().getItem() instanceof DoorUp) {
+            map = MapLoader.loadMap("/map.txt");
+            map.getPlayer().setCell(map.getCell(22, 18));
+        }
     }
 }

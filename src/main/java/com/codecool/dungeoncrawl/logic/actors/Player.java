@@ -3,7 +3,7 @@ package com.codecool.dungeoncrawl.logic.actors;
 import com.codecool.dungeoncrawl.logic.Cell;
 
 public class Player extends Actor {
-//    private int attack = 2;
+
     private String name;
 
     public Player(Cell cell) {
