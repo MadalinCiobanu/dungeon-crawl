@@ -28,8 +28,10 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Main extends Application {
-    int level = 1;
-    GameMap map = MapLoader.loadMap("/map.txt");
+    GameMap lvl1 = MapLoader.loadMap("/map.txt");
+    GameMap lvl2 = MapLoader.loadMap("/map1.txt");
+
+    GameMap map = lvl1;
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -177,11 +179,11 @@ public class Main extends Application {
         healthLabel.setText("" + map.getPlayer().getHealth());
         attackLabel.setText("" + map.getPlayer().getAttack());
         inventoryItems.setText(map.getPlayer().seeInventory().toString());
-        getPickUpButton();
+        changePickUpButton();
         changeLevel();
     }
 
-    private void getPickUpButton () {
+    private void changePickUpButton () {
         if (map.getPlayer().onItem) {
             pickUpButton.setVisible(true);
         } else {
@@ -190,11 +192,20 @@ public class Main extends Application {
     }
 
     private void changeLevel() {
-        if (map.getPlayer().getCell().getItem() instanceof DoorDown) {
-            map = MapLoader.loadMap("/map1.txt");
+        Player p = map.getPlayer();
+
+        if (p.getCell().getItem() instanceof DoorDown) {
+            DoorDown door = (DoorDown) p.getCell().getItem();
+            if (p.canUnlock() || !(door.isLocked())) {
+                door.unlock();
+                map = lvl2;
+                p.setCell(map.getCell(23, 18));
+                map.setPlayer(p);
+            }
         } else if (map.getPlayer().getCell().getItem() instanceof DoorUp) {
-            map = MapLoader.loadMap("/map.txt");
-            map.getPlayer().setCell(map.getCell(22, 18));
+            map = lvl1;
+            p.setCell(map.getCell(23, 18));
+            map.setPlayer(p);
         }
     }
 }

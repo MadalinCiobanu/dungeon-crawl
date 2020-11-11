@@ -1,41 +1,41 @@
 package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.items.Sword;
 
 import java.util.ArrayList;
 
 public class Player extends Actor {
 
     private String name;
+    private final int EXTRA_ATTACK = 2;
 
-    ArrayList<String> inventory = new ArrayList<String>();
+    private ArrayList<String> inventory = new ArrayList<String>();
+
+    public Player(Cell cell) {
+        super(cell);
+    }
 
     public void addToInventory(String item) {
-        if (item == "sword") {
-            this.setAttack(this.getAttack() + 10);
-        }
+        if (item.equals("sword")) setAttack(getAttack() + EXTRA_ATTACK);
         inventory.add(item);
+    }
+
+    public boolean canUnlock() {
+        if (inventory.contains("key")) {
+            inventory.remove("key");
+            return true;
+        }
+        return false;
     }
 
     public ArrayList<String> seeInventory() {
         return inventory;
     }
 
-    public Player(Cell cell) {
-        super(cell);
-    }
-
     public String getTileName() {
         return "player";
     }
-
-//    public int getAttack() {
-//        return attack;
-//    }
-//
-//    public void setAttack(int attack) {
-//        this.attack = attack;
-//    }
 
 
     public void setName(String name) {

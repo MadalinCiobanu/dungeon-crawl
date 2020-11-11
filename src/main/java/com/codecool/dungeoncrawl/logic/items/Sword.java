@@ -5,7 +5,7 @@ import com.codecool.dungeoncrawl.logic.Drawable;
 
 public class Sword extends Item {
 
-    public static final int attack = 10;
+    private final int attack = 2;
 
     public Sword(Cell cell) {
         super(cell);
@@ -14,5 +14,9 @@ public class Sword extends Item {
     @Override
     public String getTileName() {
         return "sword";
+    }
+
+    public int getAttack() {
+        return attack;
     }
 }

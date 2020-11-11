@@ -19,7 +19,7 @@ public abstract class Actor implements Drawable {
 
     public void move(int dx, int dy) {
         Cell nextCell = cell.getNeighbor(dx, dy);
-        if (nextCell.getType() == CellType.FLOOR && nextCell.getActor() == null) {
+        if ((nextCell.getType() == CellType.FLOOR || nextCell.getType() == CellType.BRIDGE) && nextCell.getActor() == null) {
             if (nextCell.getItem() != null) {
                 this.onItem = !(nextCell.getItem() instanceof DoorDown) && !(nextCell.getItem() instanceof DoorUp);
             } else {
