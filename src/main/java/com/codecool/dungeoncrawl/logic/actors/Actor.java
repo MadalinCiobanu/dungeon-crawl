@@ -11,6 +11,7 @@ public abstract class Actor implements Drawable {
     private int health = 10;
     private int attack = 1;
     public boolean onItem = false;
+    private boolean isDead = false;
 
     public Actor(Cell cell) {
         this.cell = cell;
@@ -33,6 +34,10 @@ public abstract class Actor implements Drawable {
             enemy.setHealth(enemy.getHealth() - this.getAttack());
             this.setHealth(this.getHealth() - enemy.getAttack());
             if (enemy.getHealth() <= 0) nextCell.setActor(null);
+            if (getHealth() <= 0) {
+                isDead = true;
+                this.getCell().setActor(null);
+            }
         }
     }
 
@@ -40,6 +45,10 @@ public abstract class Actor implements Drawable {
 
     public void setAttack(int attack) {
         this.attack = attack;
+    }
+
+    public boolean isDead() {
+        return isDead;
     }
 
     public int getHealth() {

@@ -52,30 +52,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Stage popup = new Stage();
-
-        popup.initModality(Modality.APPLICATION_MODAL);
-        popup.setTitle("Name");
-
-        Label nameLabel = new Label("Name: ");
-        TextField textField = new TextField();
-        textField.setPrefWidth(2);
-        Button submit = new Button("Submit");
-
-        submit.setOnAction(e -> {
-            map.getPlayer().setName(textField.getText());
-            popup.close();
-        });
-
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(nameLabel, textField, submit);
-        layout.setAlignment(Pos.CENTER);
-
-        Scene popUpScene = new Scene(layout, 200, 150);
-        popup.setScene(popUpScene);
-        popup.showAndWait();
-
-        // #########################
+        getName();
 
         GridPane ui = new GridPane();
         ui.setPrefWidth(220);
@@ -199,11 +176,14 @@ public class Main extends Application {
                 }
             }
         }
+
         healthLabel.setText("" + map.getPlayer().getHealth());
         attackLabel.setText("" + map.getPlayer().getAttack());
         inventoryItems.setText(map.getPlayer().seeInventory().toString());
+
         changePickUpButton();
         changeLevel();
+        isGameOver(map.getPlayer().isDead());
     }
 
     private void changePickUpButton () {
@@ -230,5 +210,51 @@ public class Main extends Application {
             p.setCell(map.getCell(23, 18));
             map.setPlayer(p);
         }
+    }
+
+    private void isGameOver(boolean isDead) {
+        if (isDead) {
+            map.setPlayer(null);
+            Stage popup = new Stage();
+
+            popup.initModality(Modality.APPLICATION_MODAL);
+            popup.setTitle("Game Over!");
+
+            Label gameOverLabel = new Label("GAME OVER!");
+            gameOverLabel.setFont(new Font(30.0));
+
+            VBox layout = new VBox(10);
+            layout.getChildren().add(gameOverLabel);
+            layout.setAlignment(Pos.CENTER);
+
+            Scene popUpScene = new Scene(layout, 250, 150);
+            popup.setScene(popUpScene);
+            popup.showAndWait();
+        }
+    }
+
+    private void getName() {
+        Stage popup = new Stage();
+
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Name");
+
+        Label nameLabel = new Label("Name: ");
+        TextField textField = new TextField();
+        textField.setPrefWidth(2);
+        Button submit = new Button("Submit");
+
+        submit.setOnAction(e -> {
+            map.getPlayer().setName(textField.getText());
+            popup.close();
+        });
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(nameLabel, textField, submit);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene popUpScene = new Scene(layout, 200, 150);
+        popup.setScene(popUpScene);
+        popup.showAndWait();
     }
 }
