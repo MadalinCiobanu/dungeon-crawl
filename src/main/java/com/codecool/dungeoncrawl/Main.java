@@ -21,9 +21,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+//import java.awt.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -41,6 +43,7 @@ public class Main extends Application {
     Label nameLabel = new Label();
     Label attackLabel = new Label();
     Button pickUpButton = new Button("Pick Up");
+    private final double FONT_SIZE = 19.0;
 
     public static void main(String[] args) {
         launch(args);
@@ -52,10 +55,11 @@ public class Main extends Application {
         Stage popup = new Stage();
 
         popup.initModality(Modality.APPLICATION_MODAL);
-        popup.setTitle("Enter your name");
+        popup.setTitle("Name");
 
         Label nameLabel = new Label("Name: ");
         TextField textField = new TextField();
+        textField.setPrefWidth(2);
         Button submit = new Button("Submit");
 
         submit.setOnAction(e -> {
@@ -67,18 +71,16 @@ public class Main extends Application {
         layout.getChildren().addAll(nameLabel, textField, submit);
         layout.setAlignment(Pos.CENTER);
 
-        Scene popUpScene = new Scene(layout, 500, 400);
+        Scene popUpScene = new Scene(layout, 200, 150);
         popup.setScene(popUpScene);
         popup.showAndWait();
 
         // #########################
 
         GridPane ui = new GridPane();
-        ui.setPrefWidth(200);
+        ui.setPrefWidth(220);
         ui.setPadding(new Insets(10));
         ui.setVgap(10);
-
-        nameLabel.setText(map.getPlayer().getName());
 
         pickUpButton.setOnAction(e -> {
             map.getPlayer().addToInventory(map.getPlayer().getCell().getItem().getTileName());
@@ -87,15 +89,36 @@ public class Main extends Application {
             pickUpButton.setVisible(false);
         });
 
-        ui.add(new Label("Player: "), 0, 0);
-        ui.add(nameLabel, 1, 0);
-        ui.add(new Label("Health: "), 0, 1);
-        ui.add(healthLabel, 1, 1);
-        ui.add(new Label("Attack: "), 0, 2);
-        ui.add(attackLabel, 1, 2);
-        ui.add(new Label("Inventory:"), 0, 5);
-        ui.add(inventoryItems, 0, 6);
-        ui.add(pickUpButton, 1, 53);
+        // Name label
+        nameLabel.setText("Player:      " + map.getPlayer().getName());
+        nameLabel.setFont(new Font(FONT_SIZE));
+        ui.add(nameLabel, 0, 1, 2, 1);
+
+        // Health labels
+        Label health = new Label("Health: ");
+        health.setFont(new Font(FONT_SIZE));
+        healthLabel.setFont(new Font(FONT_SIZE));
+        ui.add(health, 0, 2);
+        ui.add(healthLabel, 1, 2);
+
+        // Attack labels
+        Label att = new Label("Attack: ");
+        att.setFont(new Font(FONT_SIZE));
+        attackLabel.setFont(new Font(FONT_SIZE));
+        ui.add(att, 0, 3);
+        ui.add(attackLabel, 1, 3);
+
+        // Inventory labels
+        Label inv = new Label("Inventory: ");
+        inv.setFont(new Font(FONT_SIZE));
+        inventoryItems.setFont(new Font(FONT_SIZE));
+        ui.add(inv, 0, 4);
+        ui.add(inventoryItems, 0, 5, 2, 2);
+
+        // Pick Up button
+        pickUpButton.setStyle("-fx-font-size:20");
+        pickUpButton.setMinWidth(190);
+        ui.add(pickUpButton, 0, 42, 2 ,1);
 
         BorderPane borderPane = new BorderPane();
 
