@@ -39,8 +39,29 @@ public class MapLoader {
                         case '.':
                             cell.setType(CellType.FLOOR);
                             break;
+                        case '&':
+                            cell.setType(CellType.BROKEN_WALL);
+                            break;
+                        case 't':
+                            cell.setType(CellType.TREE);
+                            break;
                         case 'w':
                             cell.setType(CellType.WATER);
+                            break;
+                        case 'g':
+                            cell.setType(CellType.GRASS);
+                            break;
+                        case 'h':
+                            cell.setType(CellType.HOUSE);
+                            break;
+                        case 'r':
+                            cell.setType(CellType.ROCKS);
+                            break;
+                        case '%':
+                            cell.setType(CellType.SKULL);
+                            break;
+                        case '$':
+                            cell.setType(CellType.HUMAN_SKULL);
                             break;
                         case 'b':
                             cell.setType(CellType.BRIDGE);

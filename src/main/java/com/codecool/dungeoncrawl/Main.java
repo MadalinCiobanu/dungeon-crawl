@@ -283,7 +283,7 @@ public class Main extends Application {
         gameOverLabel.setFont(new Font(30.0));
 
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(gameOverLabel);
+        layout.getChildren().add(gameOverLabel);
         layout.setAlignment(Pos.CENTER);
 
         Scene popUpScene = new Scene(layout, 250, 150);
