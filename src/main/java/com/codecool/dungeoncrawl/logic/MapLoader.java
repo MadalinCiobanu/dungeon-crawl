@@ -4,16 +4,12 @@ import com.codecool.dungeoncrawl.logic.actors.Enemy;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.logic.actors.Scorpion;
 import com.codecool.dungeoncrawl.logic.actors.Skeleton;
-import com.codecool.dungeoncrawl.logic.items.DoorDown;
-import com.codecool.dungeoncrawl.logic.items.DoorUp;
-import com.codecool.dungeoncrawl.logic.items.Key;
-import com.codecool.dungeoncrawl.logic.items.Sword;
+import com.codecool.dungeoncrawl.logic.items.*;
 
 import java.io.InputStream;
 import java.util.Scanner;
 
 public class MapLoader {
-//    private static boolean gameStarted = false;
 
     public static GameMap loadMap(String mapPath) {
 
@@ -22,7 +18,7 @@ public class MapLoader {
         int width = scanner.nextInt();
         int height = scanner.nextInt();
 
-        scanner.nextLine(); // empty line
+        scanner.nextLine();
 
         GameMap map = new GameMap(width, height, CellType.EMPTY);
         for (int y = 0; y < height; y++) {
@@ -73,18 +69,17 @@ public class MapLoader {
                             cell.setType(CellType.FLOOR);
                             new DoorDown(cell);
                             break;
+                        case '!':
+                            cell.setType(CellType.FLOOR);
+                            new Crown(cell);
+                            break;
                         case 'u':
                             cell.setType(CellType.FLOOR);
                             new DoorUp(cell);
                             break;
                         case '@':
-//                            if (!gameStarted) {
-                                cell.setType(CellType.FLOOR);
-                                map.setPlayer(new Player(cell));
-//                            } else {
-//                                cell.setType(CellType.FLOOR);
-//                                map.setPlayer(pl);
-//                            }
+                            cell.setType(CellType.FLOOR);
+                            map.setPlayer(new Player(cell));
                             break;
                         default:
                             throw new RuntimeException("Unrecognized character: '" + line.charAt(x) + "'");
@@ -92,7 +87,6 @@ public class MapLoader {
                 }
             }
         }
-//        gameStarted = true;
         return map;
     }
 

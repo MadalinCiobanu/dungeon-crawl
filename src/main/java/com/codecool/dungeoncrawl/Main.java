@@ -4,9 +4,9 @@ import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.*;
+import com.codecool.dungeoncrawl.logic.items.Crown;
 import com.codecool.dungeoncrawl.logic.items.DoorDown;
 import com.codecool.dungeoncrawl.logic.items.DoorUp;
-import com.codecool.dungeoncrawl.logic.items.Key;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -26,7 +26,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 //import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Main extends Application {
@@ -51,7 +53,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         getName();
 
         GridPane ui = new GridPane();
@@ -138,19 +139,9 @@ public class Main extends Application {
     private void moveEnemies() {
         List<Actor> enemies = map.getEnemies();
         for (Actor e : enemies) {
-            if (e instanceof Enemy) {
-                int enemyDx = 0;
-                if (map.getPlayer().getX() < e.getX())
-                    enemyDx = -1;
-                else if (map.getPlayer().getX() > e.getX())
-                    enemyDx = 1;
-
-                int enemyDy = 0;
-                if (map.getPlayer().getY() < e.getY())
-                    enemyDy = -1;
-                else if (map.getPlayer().getY() > e.getY())
-                    enemyDy = 1;
-                e.move(enemyDx, enemyDy);
+            if (e instanceof Enemy || e instanceof Snake) {
+                Map<String, Integer> moves = followPlayer(e, map.getPlayer());
+                e.move(moves.get("dx"), moves.get("dy"));
             } else if (e instanceof Scorpion) {
                 int scorpionDx = ThreadLocalRandom.current().nextInt(-1, 2);
                 int scorpionDy = ThreadLocalRandom.current().nextInt(-1, 2);
@@ -159,6 +150,26 @@ public class Main extends Application {
                 e.move(-1, 0);
             }
         }
+    }
+
+    private Map<String, Integer> followPlayer(Actor e, Player p) {
+        Map<String, Integer> result = new HashMap<>();
+        int enemyDx = 0;
+        if (p.getX() < e.getX())
+            enemyDx = -1;
+        else if (p.getX() > e.getX())
+            enemyDx = 1;
+
+        int enemyDy = 0;
+        if (p.getY() < e.getY())
+            enemyDy = -1;
+        else if (p.getY() > e.getY())
+            enemyDy = 1;
+
+        result.put("dx", enemyDx);
+        result.put("dy", enemyDy);
+
+        return result;
     }
 
     private void refresh() {
@@ -176,10 +187,9 @@ public class Main extends Application {
                 }
             }
         }
-
         healthLabel.setText("" + map.getPlayer().getHealth());
         attackLabel.setText("" + map.getPlayer().getAttack());
-        inventoryItems.setText(map.getPlayer().seeInventory().toString());
+        inventoryItems.setText(map.getPlayer().getInventory().toString());
 
         changePickUpButton();
         changeLevel();
@@ -191,6 +201,10 @@ public class Main extends Application {
             pickUpButton.setVisible(true);
         } else {
             pickUpButton.setVisible(false);
+            if (map.getPlayer().getCell().getItem() instanceof Crown) {
+                youWin();
+                map.getPlayer().getCell().setActor(null);
+            }
         }
     }
 
@@ -254,6 +268,25 @@ public class Main extends Application {
         layout.setAlignment(Pos.CENTER);
 
         Scene popUpScene = new Scene(layout, 200, 150);
+        popup.setScene(popUpScene);
+        popup.showAndWait();
+    }
+
+    private void youWin() {
+        map.setPlayer(null);
+        Stage popup = new Stage();
+
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("You win!");
+
+        Label gameOverLabel = new Label("YOU WIN!");
+        gameOverLabel.setFont(new Font(30.0));
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(gameOverLabel);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene popUpScene = new Scene(layout, 250, 150);
         popup.setScene(popUpScene);
         popup.showAndWait();
     }

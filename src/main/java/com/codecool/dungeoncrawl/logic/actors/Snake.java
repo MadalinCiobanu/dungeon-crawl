@@ -2,16 +2,12 @@ package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
-import com.codecool.dungeoncrawl.logic.GameMap;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class Enemy extends Actor {
-    private int health = 3;
+public class Snake extends Actor {
+    private int health = 10;
     private int attack = 1;
 
-    public Enemy(Cell cell) {
+    public Snake(Cell cell) {
         super(cell);
     }
 

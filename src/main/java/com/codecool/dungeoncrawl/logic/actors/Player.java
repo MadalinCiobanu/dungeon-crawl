@@ -9,7 +9,6 @@ public class Player extends Actor {
 
     private String name;
     private final int EXTRA_ATTACK = 2;
-
     private ArrayList<String> inventory = new ArrayList<String>();
 
     public Player(Cell cell) {
@@ -29,7 +28,7 @@ public class Player extends Actor {
         return false;
     }
 
-    public ArrayList<String> seeInventory() {
+    public ArrayList<String> getInventory() {
         return inventory;
     }
 

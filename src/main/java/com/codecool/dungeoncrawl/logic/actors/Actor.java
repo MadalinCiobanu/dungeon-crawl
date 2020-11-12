@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl.logic.actors;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.Drawable;
+import com.codecool.dungeoncrawl.logic.items.Crown;
 import com.codecool.dungeoncrawl.logic.items.DoorDown;
 import com.codecool.dungeoncrawl.logic.items.DoorUp;
 
@@ -22,7 +23,9 @@ public abstract class Actor implements Drawable {
         Cell nextCell = cell.getNeighbor(dx, dy);
         if ((nextCell.getType() == CellType.FLOOR || nextCell.getType() == CellType.BRIDGE) && nextCell.getActor() == null) {
             if (nextCell.getItem() != null) {
-                this.onItem = !(nextCell.getItem() instanceof DoorDown) && !(nextCell.getItem() instanceof DoorUp);
+                this.onItem = !(nextCell.getItem() instanceof DoorDown)
+                        && !(nextCell.getItem() instanceof DoorUp)
+                        && !(nextCell.getItem() instanceof Crown);
             } else {
                 this.onItem = false;
             }
