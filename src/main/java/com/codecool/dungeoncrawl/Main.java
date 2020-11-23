@@ -140,6 +140,7 @@ public class Main extends Application {
         List<Actor> enemies = map.getEnemies();
         for (Actor e : enemies) {
             if (e instanceof Enemy || e instanceof Snake) {
+
                 Map<String, Integer> moves = followPlayer(e, map.getPlayer());
                 e.move(moves.get("dx"), moves.get("dy"));
             } else if (e instanceof Scorpion) {
