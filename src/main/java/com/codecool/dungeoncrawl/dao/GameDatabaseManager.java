@@ -27,6 +27,10 @@ public class GameDatabaseManager {
         gameStateDaoJdbc.add(gs);
     }
 
+    public GameState loadGame(int id) {
+        return gameStateDaoJdbc.get(id);
+    }
+
 
     private DataSource connect() throws SQLException {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();

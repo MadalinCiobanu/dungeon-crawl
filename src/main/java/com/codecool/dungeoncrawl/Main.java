@@ -52,6 +52,7 @@ public class Main extends Application {
     Label attackLabel = new Label();
     Button pickUpButton = new Button("Pick Up");
     Button saveButton = new Button("Save game");
+    Button loadButton = new Button("Load game");
     private final double FONT_SIZE = 19.0;
     GameDatabaseManager dbManager;
 
@@ -112,7 +113,14 @@ public class Main extends Application {
         saveButton.setMinWidth(190);
         saveButton.setFocusTraversable(false);
         saveButton.setOnAction(e -> saveGame());
-        ui.add(saveButton, 0, 41, 2 ,1);
+        ui.add(saveButton, 0, 40, 2 ,1);
+
+        // load button
+        loadButton.setStyle("-fx-font-size:20");
+        loadButton.setMinWidth(190);
+        loadButton.setFocusTraversable(false);
+        loadButton.setOnAction(e -> loadGame());
+        ui.add(loadButton, 0, 41, 2 ,1);
 
 
 
@@ -208,6 +216,7 @@ public class Main extends Application {
             }
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
+        nameLabel.setText("Player:      " + map.getPlayer().getName());
         attackLabel.setText("" + map.getPlayer().getAttack());
         inventoryItems.setText(map.getPlayer().getInventory().toString());
 
@@ -236,12 +245,14 @@ public class Main extends Application {
             DoorDown door = (DoorDown) p.getCell().getItem();
             if (p.canUnlock() || !(door.isLocked())) {
                 door.unlock();
+                map.getPlayer().getCell().setActor(null);
                 map = lvl2;
                 p.setCell(map.getCell(23, 18));
                 map.setPlayer(p);
             }
         } else if (map.getPlayer().getCell().getItem() instanceof DoorUp) {
             map = lvl1;
+            map.getPlayer().getCell().setActor(null);
             p.setCell(map.getCell(23, 18));
             map.setPlayer(p);
         }
@@ -328,5 +339,29 @@ public class Main extends Application {
         GameState gs = new GameState(map.getLevel(), date, pm);
 
         dbManager.saveGame(gs);
+    }
+
+    private void loadGame() {
+        setupDbManager();
+        GameState gs = dbManager.loadGame(5);
+
+        // Select correct level
+        map = gs.getCurrentMap().equals("1")
+            ? MapLoader.loadMap("/map.txt")
+            : MapLoader.loadMap("/map1.txt");
+
+        // Instantiate new player with saved data
+        Player savedPlayer = new Player(map.getCell(gs.getPlayer().getX(), gs.getPlayer().getY()));
+        savedPlayer.setName(gs.getPlayer().getPlayerName());
+        savedPlayer.setHealth(gs.getPlayer().getHp());
+
+        // Delete original player if level is 1
+        if (gs.getCurrentMap().equals("1")) {
+            map.getPlayer().getCell().setActor(null);
+        }
+
+        // Put saved player on the map
+        map.setPlayer(savedPlayer);
+        refresh();
     }
 }
