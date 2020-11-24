@@ -17,6 +17,9 @@ public class MapLoader {
         Scanner scanner = new Scanner(is);
         int width = scanner.nextInt();
         int height = scanner.nextInt();
+        String level = mapPath.equals("/map.txt")
+            ? "1"
+            : "2";
 
         scanner.nextLine();
 
@@ -108,6 +111,7 @@ public class MapLoader {
                 }
             }
         }
+        map.setLevel(level);
         return map;
     }
 

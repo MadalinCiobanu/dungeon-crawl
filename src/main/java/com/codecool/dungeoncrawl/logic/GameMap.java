@@ -11,11 +11,16 @@ public class GameMap {
     private int height;
     private Cell[][] cells;
 
+
+
+    private String level;
+
     private Player player;
 
     public GameMap(int width, int height, CellType defaultCellType) {
         this.width = width;
         this.height = height;
+        this.level = level;
         cells = new Cell[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -57,5 +62,13 @@ public class GameMap {
 
     public int getHeight() {
         return height;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
     }
 }

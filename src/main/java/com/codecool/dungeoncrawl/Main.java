@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl;
 
 import com.codecool.dungeoncrawl.dao.GameDatabaseManager;
+import com.codecool.dungeoncrawl.dao.PlayerDaoJdbc;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
@@ -8,6 +9,8 @@ import com.codecool.dungeoncrawl.logic.actors.*;
 import com.codecool.dungeoncrawl.logic.items.Crown;
 import com.codecool.dungeoncrawl.logic.items.DoorDown;
 import com.codecool.dungeoncrawl.logic.items.DoorUp;
+import com.codecool.dungeoncrawl.model.GameState;
+import com.codecool.dungeoncrawl.model.PlayerModel;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,6 +30,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 //import java.awt.*;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +51,7 @@ public class Main extends Application {
     Label nameLabel = new Label();
     Label attackLabel = new Label();
     Button pickUpButton = new Button("Pick Up");
+    Button saveButton = new Button("Save game");
     private final double FONT_SIZE = 19.0;
     GameDatabaseManager dbManager;
 
@@ -99,9 +104,16 @@ public class Main extends Application {
         // Pick Up button
         pickUpButton.setStyle("-fx-font-size:20");
         pickUpButton.setMinWidth(190);
+        pickUpButton.setFocusTraversable(false);
         ui.add(pickUpButton, 0, 42, 2 ,1);
 
         // Save button
+        saveButton.setStyle("-fx-font-size:20");
+        saveButton.setMinWidth(190);
+        saveButton.setFocusTraversable(false);
+        saveButton.setOnAction(e -> saveGame());
+        ui.add(saveButton, 0, 41, 2 ,1);
+
 
 
         BorderPane borderPane = new BorderPane();
@@ -138,6 +150,7 @@ public class Main extends Application {
             case RIGHT:
                 map.getPlayer().move(1,0);
                 refresh();
+
                 break;
         }
     }
@@ -201,6 +214,7 @@ public class Main extends Application {
         changePickUpButton();
         changeLevel();
         isGameOver(map.getPlayer().isDead());
+        canvas.requestFocus();
     }
 
     private void changePickUpButton () {
@@ -305,5 +319,14 @@ public class Main extends Application {
         } catch (SQLException ex) {
             System.out.println("Cannot connect to database.");
         }
+    }
+
+    private void saveGame() {
+        setupDbManager();
+        PlayerModel pm = new PlayerModel(map.getPlayer());
+        java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
+        GameState gs = new GameState(map.getLevel(), date, pm);
+
+        dbManager.saveGame(gs);
     }
 }
