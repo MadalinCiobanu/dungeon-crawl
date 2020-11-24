@@ -33,7 +33,26 @@ public class PlayerDaoJdbc implements PlayerDao {
 
     @Override
     public void update(PlayerModel player) {
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "UPDATE player SET player_name = ?," +
+                "hp = ?," +
+                "x = ?," +
+                "y = ?" +
+                "WHERE id = ?";
 
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setString(1, player.getPlayerName());
+            statement.setInt(2, player.getHp());
+            statement.setInt(3, player.getX());
+            statement.setInt(4, player.getY());
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println("Could not connect to database while updating player");
+            System.out.println(e);
+            System.exit(1);
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.codecool.dungeoncrawl;
 
+import com.codecool.dungeoncrawl.dao.GameDatabaseManager;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
@@ -26,6 +27,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 //import java.awt.*;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ public class Main extends Application {
     Label attackLabel = new Label();
     Button pickUpButton = new Button("Pick Up");
     private final double FONT_SIZE = 19.0;
+    GameDatabaseManager dbManager;
 
     public static void main(String[] args) {
         launch(args);
@@ -97,6 +100,9 @@ public class Main extends Application {
         pickUpButton.setStyle("-fx-font-size:20");
         pickUpButton.setMinWidth(190);
         ui.add(pickUpButton, 0, 42, 2 ,1);
+
+        // Save button
+
 
         BorderPane borderPane = new BorderPane();
 
@@ -290,5 +296,14 @@ public class Main extends Application {
         Scene popUpScene = new Scene(layout, 250, 150);
         popup.setScene(popUpScene);
         popup.showAndWait();
+    }
+
+    private void setupDbManager() {
+        dbManager = new GameDatabaseManager();
+        try {
+            dbManager.setup();
+        } catch (SQLException ex) {
+            System.out.println("Cannot connect to database.");
+        }
     }
 }
