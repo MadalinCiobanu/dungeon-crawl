@@ -23,22 +23,20 @@ public class GameStateDaoJdbc implements GameStateDao {
     public void add(GameState state) {
         PlayerModel p = state.getPlayer();
         playerDao.add(p);
-        int playerId = playerDao.getIdByName(p.getPlayerName());
-        System.out.println(playerId);
-//        try (Connection conn = dataSource.getConnection()) {
-//            String sql = "INSERT INTO game_state (current_map, saved_at, x, y) VALUES (?, ?, ?, ?)";
-//            PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-//            statement.setString(1, player.getPlayerName());
-//            statement.setInt(2, player.getHp());
-//            statement.setInt(3, player.getX());
-//            statement.setInt(4, player.getY());
-//            statement.executeUpdate();
-//            ResultSet resultSet = statement.getGeneratedKeys();
-//            resultSet.next();
-//            player.setId(resultSet.getInt(1));
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
+
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "INSERT INTO game_state (current_map, saved_at, player_id) VALUES (?, ?, ?)";
+            PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, state.getCurrentMap());
+            statement.setDate(2, state.getSavedAt());
+            statement.setInt(3, state.getPlayer().getId());
+            statement.execute();
+
+        } catch (SQLException e) {
+            System.out.println("Eroare din GameStateDao Add");
+            System.out.println(e);
+            System.exit(1);
+        }
     }
 
     @Override

@@ -65,21 +65,4 @@ public class PlayerDaoJdbc implements PlayerDao {
         return null;
     }
 
-    public int getIdByName(String name) {
-        try (Connection conn = dataSource.getConnection()) {
-            String sql = "SELECT id FROM player WHERE player_name LIKE ?";
-            PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, name);
-            ResultSet result = statement.executeQuery();
-            result.next();
-            return result.getInt(1);
-
-        } catch (SQLException e) {
-            System.out.println(e);
-        } catch (Exception exception) {
-            System.out.println(exception);
-        }
-
-        return -1;
-    }
 }
