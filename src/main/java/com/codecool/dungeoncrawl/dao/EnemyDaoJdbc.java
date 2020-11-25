@@ -20,7 +20,7 @@ public class EnemyDaoJdbc implements EnemyDao {
     @Override
     public void add(EnemyModel enemyModel, int saveId) {
         try (Connection conn = dataSource.getConnection()) {
-            String sql = "INSERT INTO enemy (enemy_name, hp, x, y, game_state_id) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO enemy (enemy_name, hp, x, y, game_state_id, level) VALUES (?, ?, ?, ?, ?, ?)";
 
             PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, enemyModel.getEnemyName());
@@ -28,6 +28,7 @@ public class EnemyDaoJdbc implements EnemyDao {
             statement.setInt(3, enemyModel.getX());
             statement.setInt(4, enemyModel.getY());
             statement.setInt(5, saveId);
+            statement.setInt(6, enemyModel.getLevel());
             statement.executeUpdate();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
@@ -45,7 +46,7 @@ public class EnemyDaoJdbc implements EnemyDao {
     @Override
     public List<EnemyModel> get(int gameId) {
         try (Connection connection = dataSource.getConnection()) {
-            String sql = "SELECT id, enemy_name, hp, x, y FROM enemy WHERE game_state_id = ?";
+            String sql = "SELECT id, enemy_name, hp, x, y, level FROM enemy WHERE game_state_id = ?";
 
             PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -61,12 +62,14 @@ public class EnemyDaoJdbc implements EnemyDao {
                 int enemyHp = rs.getInt(3);
                 int enemyX = rs.getInt(4);
                 int enemyY = rs.getInt(5);
+                int enemyLevel = rs.getInt(6);
 
                 EnemyModel enemyModel = new EnemyModel(
                     enemyName,
                     enemyHp,
                     enemyX,
-                    enemyY
+                    enemyY,
+                    enemyLevel
                 );
 
                 enemyModel.setId(enemyId);

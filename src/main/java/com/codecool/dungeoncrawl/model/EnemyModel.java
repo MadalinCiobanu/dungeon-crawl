@@ -7,11 +7,18 @@ public class EnemyModel extends BaseModel {
     private int x;
     private int y;
 
-    public EnemyModel(String enemyName, int hp, int x, int y) {
+    public int getLevel() {
+        return level;
+    }
+
+    private int level;
+
+    public EnemyModel(String enemyName, int hp, int x, int y, int level) {
         this.enemyName = enemyName;
         this.hp = hp;
         this.x = x;
         this.y = y;
+        this.level = level;
     }
 
     public String getEnemyName() {

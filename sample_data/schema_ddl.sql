@@ -23,6 +23,7 @@ CREATE TABLE public.enemy (
       hp integer NOT NULL,
       x integer NOT NULL,
       y integer NOT NULL,
+      level integer NOT NULL,
       game_state_id integer NOT NULL
 );
 

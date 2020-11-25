@@ -127,8 +127,6 @@ public class Main extends Application {
         loadButton.setOnAction(e -> loadGameModal());
         ui.add(loadButton, 0, 41, 2 ,1);
 
-
-
         BorderPane borderPane = new BorderPane();
 
         borderPane.setCenter(canvas);
@@ -341,21 +339,7 @@ public class Main extends Application {
         setupDbManager();
         PlayerModel pm = new PlayerModel(map.getPlayer());
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
-
-        List<Actor> enemies = lvl1.getEnemies();
-        enemies.addAll(lvl2.getEnemies());
-
-        List<EnemyModel> enemyModels = enemies.stream()
-            .map(enemy -> {
-                String enemyName = enemy.getTileName();
-                int enemyHp = enemy.getHealth();
-                int enemyX = enemy.getX();
-                int enemyY = enemy.getY();
-
-                return new EnemyModel(enemyName, enemyHp, enemyX, enemyY);
-            })
-            .collect(Collectors.toList());
-
+        List<EnemyModel> enemyModels = getAllEnemyModels();
         GameState gs = new GameState(map.getLevel(), date, saveName, pm, enemyModels);
 
         dbManager.saveGame(gs);
@@ -365,10 +349,14 @@ public class Main extends Application {
         setupDbManager();
         GameState gs = dbManager.loadGame(saveId);
 
+       // Reload both levels
+        lvl1 = MapLoader.loadMap("/map.txt");
+        lvl2 = MapLoader.loadMap("/map1.txt");
+
         // Select correct level
         map = gs.getCurrentMap().equals("1")
-            ? MapLoader.loadMap("/map.txt")
-            : MapLoader.loadMap("/map1.txt");
+            ? lvl1
+            : lvl2;
 
         // Instantiate new player with saved data
         Player savedPlayer = new Player(map.getCell(gs.getPlayer().getX(), gs.getPlayer().getY()));
@@ -376,26 +364,28 @@ public class Main extends Application {
         savedPlayer.setHealth(gs.getPlayer().getHp());
 
         // Remove enemies
-        map.removeEnemies();
+        lvl1.removeEnemies();
+        lvl2.removeEnemies();
 
         // Add saved enemies
         List<EnemyModel> enemyModels = gs.getEnemies();
         for (EnemyModel em : enemyModels) {
+            Cell c = em.getLevel() == 1
+                ? lvl1.getCell(em.getX(), em.getY())
+                : lvl2.getCell(em.getX(), em.getY());
+
             if (em.getEnemyName().equals("skeleton"))
             {
-                Cell c = map.getCell(em.getX(), em.getY());
                 Skeleton s = new Skeleton(c);
                 s.setHealth(em.getHp());
             }
             else if (em.getEnemyName().equals("enemy"))
             {
-                Cell c = map.getCell(em.getX(), em.getY());
                 Enemy e = new Enemy(c);
                 e.setHealth(em.getHp());
             }
             else if (em.getEnemyName().equals("scorpion"))
             {
-                Cell c = map.getCell(em.getX(), em.getY());
                 Scorpion s = new Scorpion(c);
                 s.setHealth(em.getHp());
             }
@@ -457,6 +447,7 @@ public class Main extends Application {
             String selectedRow = (String) listView.getSelectionModel().getSelectedItem();
 
             int saveId = Integer.parseInt(selectedRow.split("#")[0]);
+//            GameState toBeLoaded = dbManager.loadGame(saveId);
             loadGame(saveId);
             popup.close();
         });
@@ -468,5 +459,30 @@ public class Main extends Application {
         Scene popUpScene = new Scene(layout, 200, 150);
         popup.setScene(popUpScene);
         popup.showAndWait();
+    }
+
+    public List<EnemyModel> getAllEnemyModels() {
+        List<EnemyModel> enemiesLvl1 = lvl1.getEnemies().stream()
+            .map(enemy -> { return new EnemyModel(
+                    enemy.getTileName(),
+                    enemy.getHealth(),
+                    enemy.getX(),
+                    enemy.getY(),
+                    1);
+            })
+            .collect(Collectors.toList());
+
+        List<EnemyModel> enemiesLvl2 = lvl2.getEnemies().stream()
+            .map(enemy -> { return new EnemyModel(
+                enemy.getTileName(),
+                enemy.getHealth(),
+                enemy.getX(),
+                enemy.getY(),
+                2);
+            })
+            .collect(Collectors.toList());
+
+        enemiesLvl1.addAll(enemiesLvl2);
+        return enemiesLvl1;
     }
 }
