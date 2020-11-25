@@ -12,6 +12,7 @@ import com.codecool.dungeoncrawl.logic.items.DoorUp;
 import com.codecool.dungeoncrawl.model.GameState;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,6 +20,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -32,6 +34,7 @@ import javafx.stage.Stage;
 //import java.awt.*;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,14 +115,14 @@ public class Main extends Application {
         saveButton.setStyle("-fx-font-size:20");
         saveButton.setMinWidth(190);
         saveButton.setFocusTraversable(false);
-        saveButton.setOnAction(e -> saveGame());
+        saveButton.setOnAction(e -> saveGameModal());
         ui.add(saveButton, 0, 40, 2 ,1);
 
         // load button
         loadButton.setStyle("-fx-font-size:20");
         loadButton.setMinWidth(190);
         loadButton.setFocusTraversable(false);
-        loadButton.setOnAction(e -> loadGame());
+        loadButton.setOnAction(e -> loadGameModal());
         ui.add(loadButton, 0, 41, 2 ,1);
 
 
@@ -166,7 +169,7 @@ public class Main extends Application {
     private void moveEnemies() {
         List<Actor> enemies = map.getEnemies();
         for (Actor e : enemies) {
-            if (e instanceof Enemy || e instanceof Snake) {
+            if (e instanceof Enemy) {
 
                 Map<String, Integer> moves = followPlayer(e, map.getPlayer());
                 e.move(moves.get("dx"), moves.get("dy"));
@@ -332,18 +335,18 @@ public class Main extends Application {
         }
     }
 
-    private void saveGame() {
+    private void saveGame(String saveName) {
         setupDbManager();
         PlayerModel pm = new PlayerModel(map.getPlayer());
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
-        GameState gs = new GameState(map.getLevel(), date, pm);
+        GameState gs = new GameState(map.getLevel(), date, saveName, pm);
 
         dbManager.saveGame(gs);
     }
 
-    private void loadGame() {
+    private void loadGame(int saveId) {
         setupDbManager();
-        GameState gs = dbManager.loadGame(5);
+        GameState gs = dbManager.loadGame(saveId);
 
         // Select correct level
         map = gs.getCurrentMap().equals("1")
@@ -355,6 +358,9 @@ public class Main extends Application {
         savedPlayer.setName(gs.getPlayer().getPlayerName());
         savedPlayer.setHealth(gs.getPlayer().getHp());
 
+        // Remove enemies
+        map.removeEnemies();
+
         // Delete original player if level is 1
         if (gs.getCurrentMap().equals("1")) {
             map.getPlayer().getCell().setActor(null);
@@ -363,5 +369,64 @@ public class Main extends Application {
         // Put saved player on the map
         map.setPlayer(savedPlayer);
         refresh();
+    }
+
+    private void saveGameModal() {
+        Stage popup = new Stage();
+
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Save");
+
+        Label saveLabel = new Label("Save: ");
+        TextField textField = new TextField();
+        textField.setPrefWidth(2);
+        Button submit = new Button("Submit");
+
+        submit.setOnAction(e -> {
+            saveGame(textField.getText());
+            popup.close();
+        });
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(saveLabel, textField, submit);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene popUpScene = new Scene(layout, 200, 150);
+        popup.setScene(popUpScene);
+        popup.showAndWait();
+    }
+
+    private void loadGameModal() {
+        Stage popup = new Stage();
+
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Load");
+
+        Label saveLabel = new Label("Load: ");
+
+        ListView listView = new ListView();
+        setupDbManager();
+        List<GameState> allSaves = dbManager.getAllSavedGames();
+
+        for (GameState save : allSaves) {
+            listView.getItems().add(save.getId() + "# " + save.getSaveName() + " (" + save.getPlayer().getPlayerName() + ")");
+        }
+
+        Button submit = new Button("Submit");
+        submit.setOnAction(event -> {
+            String selectedRow = (String) listView.getSelectionModel().getSelectedItem();
+
+            int saveId = Integer.parseInt(selectedRow.split("#")[0]);
+            loadGame(saveId);
+            popup.close();
+        });
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(saveLabel, listView, submit);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene popUpScene = new Scene(layout, 200, 150);
+        popup.setScene(popUpScene);
+        popup.showAndWait();
     }
 }

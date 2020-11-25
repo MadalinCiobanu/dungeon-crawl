@@ -10,11 +10,7 @@ public class GameMap {
     private int width;
     private int height;
     private Cell[][] cells;
-
-
-
     private String level;
-
     private Player player;
 
     public GameMap(int width, int height, CellType defaultCellType) {
@@ -70,5 +66,16 @@ public class GameMap {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public void removeEnemies() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (!(cells[x][y].getActor() instanceof Player)) {
+                    cells[x][y].setActor(null);
+                }
+
+            }
+        }
     }
 }
