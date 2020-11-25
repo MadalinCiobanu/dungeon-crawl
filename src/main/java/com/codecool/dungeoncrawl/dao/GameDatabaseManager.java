@@ -13,11 +13,13 @@ import java.util.List;
 public class GameDatabaseManager {
     private PlayerDao playerDao;
     private GameStateDaoJdbc gameStateDaoJdbc;
+    private EnemyDao enemyDao;
 
     public void setup() throws SQLException {
         DataSource dataSource = connect();
         playerDao = new PlayerDaoJdbc(dataSource);
         gameStateDaoJdbc = new GameStateDaoJdbc(dataSource, playerDao);
+        enemyDao = new EnemyDaoJdbc(dataSource);
     }
 
     public void savePlayer(Player player) {
