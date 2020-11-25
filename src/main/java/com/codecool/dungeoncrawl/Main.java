@@ -9,6 +9,7 @@ import com.codecool.dungeoncrawl.logic.actors.*;
 import com.codecool.dungeoncrawl.logic.items.Crown;
 import com.codecool.dungeoncrawl.logic.items.DoorDown;
 import com.codecool.dungeoncrawl.logic.items.DoorUp;
+import com.codecool.dungeoncrawl.model.EnemyModel;
 import com.codecool.dungeoncrawl.model.GameState;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 import javafx.application.Application;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class Main extends Application {
     GameMap lvl1 = MapLoader.loadMap("/map.txt");
@@ -339,7 +341,22 @@ public class Main extends Application {
         setupDbManager();
         PlayerModel pm = new PlayerModel(map.getPlayer());
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
-        GameState gs = new GameState(map.getLevel(), date, saveName, pm);
+
+        List<Actor> enemies = lvl1.getEnemies();
+        enemies.addAll(lvl2.getEnemies());
+
+        List<EnemyModel> enemyModels = enemies.stream()
+            .map(enemy -> {
+                String enemyName = enemy.getTileName();
+                int enemyHp = enemy.getHealth();
+                int enemyX = enemy.getX();
+                int enemyY = enemy.getY();
+
+                return new EnemyModel(enemyName, enemyHp, enemyX, enemyY);
+            })
+            .collect(Collectors.toList());
+
+        GameState gs = new GameState(map.getLevel(), date, saveName, pm, enemyModels);
 
         dbManager.saveGame(gs);
     }
@@ -360,6 +377,29 @@ public class Main extends Application {
 
         // Remove enemies
         map.removeEnemies();
+
+        // Add saved enemies
+        List<EnemyModel> enemyModels = gs.getEnemies();
+        for (EnemyModel em : enemyModels) {
+            if (em.getEnemyName().equals("skeleton"))
+            {
+                Cell c = map.getCell(em.getX(), em.getY());
+                Skeleton s = new Skeleton(c);
+                s.setHealth(em.getHp());
+            }
+            else if (em.getEnemyName().equals("enemy"))
+            {
+                Cell c = map.getCell(em.getX(), em.getY());
+                Enemy e = new Enemy(c);
+                e.setHealth(em.getHp());
+            }
+            else if (em.getEnemyName().equals("scorpion"))
+            {
+                Cell c = map.getCell(em.getX(), em.getY());
+                Scorpion s = new Scorpion(c);
+                s.setHealth(em.getHp());
+            }
+        }
 
         // Delete original player if level is 1
         if (gs.getCurrentMap().equals("1")) {

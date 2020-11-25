@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl.dao;
 
 import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.model.EnemyModel;
 import com.codecool.dungeoncrawl.model.GameState;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 
@@ -13,10 +14,12 @@ public class GameStateDaoJdbc implements GameStateDao {
 
     private DataSource dataSource;
     private PlayerDao playerDao;
+    private EnemyDao enemyDao;
 
-    public GameStateDaoJdbc (DataSource dataSource, PlayerDao playerDao) {
+    public GameStateDaoJdbc (DataSource dataSource, PlayerDao playerDao, EnemyDao enemyDao) {
         this.dataSource = dataSource;
         this.playerDao = playerDao;
+        this.enemyDao = enemyDao;
     }
 
     @Override
@@ -31,7 +34,16 @@ public class GameStateDaoJdbc implements GameStateDao {
             statement.setDate(2, state.getSavedAt());
             statement.setInt(3, state.getPlayer().getId());
             statement.setString(4, state.getSaveName());
-            statement.execute();
+            statement.executeUpdate();
+            ResultSet resultSet = statement.getGeneratedKeys();
+            resultSet.next();
+            state.setId(resultSet.getInt(1));
+
+            // Add enemies
+            for (EnemyModel em : state.getEnemies()) {
+                System.out.println(state.getId());
+                enemyDao.add(em, state.getId());
+            }
 
         } catch (SQLException e) {
             System.out.println("Eroare din GameStateDao Add");
@@ -70,7 +82,7 @@ public class GameStateDaoJdbc implements GameStateDao {
         }
         PlayerModel pm = playerDao.get(playerId);
 
-        return new GameState(currentMap, savedAt, saveName, pm);
+        return new GameState(currentMap, savedAt, saveName, pm, enemyDao.get(id));
     }
 
     @Override
@@ -94,7 +106,8 @@ public class GameStateDaoJdbc implements GameStateDao {
                     currentMap,
                     savedAt,
                     saveName,
-                    pm);
+                    pm,
+                    enemyDao.get(saveId));
 
                 gameState.setId(saveId);
 
@@ -102,6 +115,7 @@ public class GameStateDaoJdbc implements GameStateDao {
             }
             return result;
         } catch (SQLException e) {
+            System.out.println(e);
             throw new RuntimeException("Error while getting all Saves");
         }
     }

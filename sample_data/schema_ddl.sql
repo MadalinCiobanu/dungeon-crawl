@@ -30,4 +30,4 @@ ALTER TABLE ONLY public.game_state
     ADD CONSTRAINT fk_player_id FOREIGN KEY (player_id) REFERENCES public.player(id);
 
 ALTER TABLE ONLY public.enemy
-    ADD CONSTRAINT fk_game_state_id FOREIGN KEY (id) REFERENCES public.game_state(id);
+    ADD CONSTRAINT fk_game_state_id FOREIGN KEY (game_state_id) REFERENCES public.game_state(id);
