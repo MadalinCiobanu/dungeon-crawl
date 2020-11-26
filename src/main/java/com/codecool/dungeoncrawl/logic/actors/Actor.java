@@ -21,25 +21,27 @@ public abstract class Actor implements Drawable {
 
     public void move(int dx, int dy) {
         Cell nextCell = cell.getNeighbor(dx, dy);
-        if ((nextCell.getType() == CellType.FLOOR || nextCell.getType() == CellType.BRIDGE) && nextCell.getActor() == null) {
-            if (nextCell.getItem() != null) {
-                this.onItem = !(nextCell.getItem() instanceof DoorDown)
-                        && !(nextCell.getItem() instanceof DoorUp)
-                        && !(nextCell.getItem() instanceof Crown);
-            } else {
-                this.onItem = false;
-            }
-            cell.setActor(null);
-            nextCell.setActor(this);
-            cell = nextCell;
-        } else if (nextCell.getActor() != null) {
-            Actor enemy = nextCell.getActor();
-            enemy.setHealth(enemy.getHealth() - this.getAttack());
-            this.setHealth(this.getHealth() - enemy.getAttack());
-            if (enemy.getHealth() <= 0) nextCell.setActor(null);
-            if (getHealth() <= 0) {
-                isDead = true;
-                this.getCell().setActor(null);
+        if (nextCell != null) {
+            if ((nextCell.getType() == CellType.FLOOR || nextCell.getType() == CellType.BRIDGE) && nextCell.getActor() == null) {
+                if (nextCell.getItem() != null) {
+                    this.onItem = !(nextCell.getItem() instanceof DoorDown)
+                            && !(nextCell.getItem() instanceof DoorUp)
+                            && !(nextCell.getItem() instanceof Crown);
+                } else {
+                    this.onItem = false;
+                }
+                cell.setActor(null);
+                nextCell.setActor(this);
+                cell = nextCell;
+            } else if (nextCell.getActor() != null) {
+                Actor enemy = nextCell.getActor();
+                enemy.setHealth(enemy.getHealth() - this.getAttack());
+                this.setHealth(this.getHealth() - enemy.getAttack());
+                if (enemy.getHealth() <= 0) nextCell.setActor(null);
+                if (getHealth() <= 0) {
+                    isDead = true;
+                    this.getCell().setActor(null);
+                }
             }
         }
     }

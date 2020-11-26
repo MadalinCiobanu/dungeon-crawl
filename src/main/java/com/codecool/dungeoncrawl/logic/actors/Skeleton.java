@@ -5,7 +5,7 @@ import com.codecool.dungeoncrawl.logic.CellType;
 
 public class Skeleton extends Actor {
     private static int direction = -1;
-    private int health = 1;
+    private int health = 2;
     private int attack = 1;
 
     public Skeleton(Cell cell) {

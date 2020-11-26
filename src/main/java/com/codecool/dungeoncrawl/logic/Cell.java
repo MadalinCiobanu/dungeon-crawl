@@ -42,7 +42,11 @@ public class Cell implements Drawable {
     }
 
     public Cell getNeighbor(int dx, int dy) {
-        return gameMap.getCell(x + dx, y + dy);
+        if ((gameMap.getWidth() > (x + dx) && (x + dx) >= 0) && (gameMap.getHeight() > (y + dy) && (y + dy) >= 0)) {
+            return gameMap.getCell(x + dx, y + dy);
+        } else {
+            return null;
+        }
     }
 
     @Override
