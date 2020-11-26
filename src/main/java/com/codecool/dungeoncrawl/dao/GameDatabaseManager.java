@@ -14,12 +14,14 @@ public class GameDatabaseManager {
     private PlayerDao playerDao;
     private GameStateDaoJdbc gameStateDaoJdbc;
     private EnemyDao enemyDao;
+    private ItemDao itemDao;
 
     public void setup() throws SQLException {
         DataSource dataSource = connect();
         playerDao = new PlayerDaoJdbc(dataSource);
         enemyDao = new EnemyDaoJdbc(dataSource);
-        gameStateDaoJdbc = new GameStateDaoJdbc(dataSource, playerDao, enemyDao);
+        itemDao = new ItemDaoJdbc(dataSource);
+        gameStateDaoJdbc = new GameStateDaoJdbc(dataSource, playerDao, enemyDao, itemDao);
     }
 
     public void savePlayer(Player player) {

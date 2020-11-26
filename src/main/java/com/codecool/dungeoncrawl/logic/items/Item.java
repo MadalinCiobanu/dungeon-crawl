@@ -22,4 +22,9 @@ public abstract class Item implements Drawable {
     public int getY() {
         return cell.getY();
     }
+
+    public boolean isPickable() {
+        return false;
+    }
+
 }

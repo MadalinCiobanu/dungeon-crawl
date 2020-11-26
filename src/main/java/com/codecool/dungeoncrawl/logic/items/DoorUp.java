@@ -7,6 +7,7 @@ public class DoorUp extends Item {
         super(cell);
     }
 
+
     @Override
     public String getTileName() {
         return "doorUp";

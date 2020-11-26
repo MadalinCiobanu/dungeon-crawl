@@ -9,6 +9,11 @@ public class Key extends Item {
     }
 
     @Override
+    public boolean isPickable() {
+        return true;
+    }
+
+    @Override
     public String getTileName() {
         return "key";
     }

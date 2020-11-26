@@ -9,9 +9,12 @@ import com.codecool.dungeoncrawl.logic.actors.*;
 import com.codecool.dungeoncrawl.logic.items.Crown;
 import com.codecool.dungeoncrawl.logic.items.DoorDown;
 import com.codecool.dungeoncrawl.logic.items.DoorUp;
+import com.codecool.dungeoncrawl.logic.items.Item;
 import com.codecool.dungeoncrawl.model.EnemyModel;
 import com.codecool.dungeoncrawl.model.GameState;
+import com.codecool.dungeoncrawl.model.ItemModel;
 import com.codecool.dungeoncrawl.model.PlayerModel;
+import com.google.gson.Gson;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -29,6 +32,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -340,14 +344,18 @@ public class Main extends Application {
         PlayerModel pm = new PlayerModel(map.getPlayer());
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
         List<EnemyModel> enemyModels = getAllEnemyModels();
-        GameState gs = new GameState(map.getLevel(), date, saveName, pm, enemyModels);
+        List<ItemModel> itemModels = getAllItemModels();
+        GameState gs = new GameState(map.getLevel(), date, saveName, pm, enemyModels, itemModels);
 
+        String save = new Gson().toJson(gs);
+        System.out.println(save);
         dbManager.saveGame(gs);
     }
 
-    private void loadGame(int saveId) {
+    private void loadGame(GameState gs) {
         setupDbManager();
-        GameState gs = dbManager.loadGame(saveId);
+//        GameState gs = dbManager.loadGame(saveId);
+        System.out.println("Loading game");
 
        // Reload both levels
         lvl1 = MapLoader.loadMap("/map.txt");
@@ -359,6 +367,7 @@ public class Main extends Application {
             : lvl2;
 
         // Instantiate new player with saved data
+
         Player savedPlayer = new Player(map.getCell(gs.getPlayer().getX(), gs.getPlayer().getY()));
         savedPlayer.setName(gs.getPlayer().getPlayerName());
         savedPlayer.setHealth(gs.getPlayer().getHp());
@@ -390,6 +399,45 @@ public class Main extends Application {
                 s.setHealth(em.getHp());
             }
         }
+
+
+        // Get saved items
+        List<ItemModel> itemModels = gs.getItems();
+        for (ItemModel im : itemModels) {
+            if (im.getItemName().equals("sword")) {
+                if (im.isPicked()) {
+                    lvl1.removeItemByTileName(im.getItemName());
+                    savedPlayer.addToInventory("sword");
+                }
+            }
+
+            if (im.getItemName().equals("key")) {
+                if (im.isPicked()) {
+                    System.out.println("Key was picked up");
+
+                    if (!im.isUsed()) {
+                        System.out.println("Key was not used");
+
+                        savedPlayer.addToInventory("key");
+                        System.out.println("Adding key to inventory");
+
+                        lvl1.removeItemByTileName(im.getItemName());
+                        System.out.println("Removed Key from map");
+
+
+                    } else {
+                        System.out.println("Key was used");
+
+                        lvl1.removeItemByTileName(im.getItemName());
+                        System.out.println("Removed Key from map");
+
+                        lvl1.getDoorDown().unlock();
+                        System.out.println("Unlocking door");
+                    }
+                }
+            }
+        }
+
 
         // Delete original player if level is 1
         if (gs.getCurrentMap().equals("1")) {
@@ -442,26 +490,32 @@ public class Main extends Application {
             listView.getItems().add(save.getId() + "# " + save.getSaveName() + " (" + save.getPlayer().getPlayerName() + ")");
         }
 
+        Button loadFromFile = new Button("Select a file");
+        loadFromFile.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Resource File");
+            fileChooser.showOpenDialog(popup);
+        });
         Button submit = new Button("Submit");
         submit.setOnAction(event -> {
             String selectedRow = (String) listView.getSelectionModel().getSelectedItem();
 
             int saveId = Integer.parseInt(selectedRow.split("#")[0]);
-//            GameState toBeLoaded = dbManager.loadGame(saveId);
-            loadGame(saveId);
+            GameState toBeLoaded = dbManager.loadGame(saveId);
+            loadGame(toBeLoaded);
             popup.close();
         });
 
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(saveLabel, listView, submit);
+        layout.getChildren().addAll(saveLabel, listView, submit, loadFromFile);
         layout.setAlignment(Pos.CENTER);
 
-        Scene popUpScene = new Scene(layout, 200, 150);
+        Scene popUpScene = new Scene(layout, 300, 400);
         popup.setScene(popUpScene);
         popup.showAndWait();
     }
 
-    public List<EnemyModel> getAllEnemyModels() {
+    private List<EnemyModel> getAllEnemyModels() {
         List<EnemyModel> enemiesLvl1 = lvl1.getEnemies().stream()
             .map(enemy -> { return new EnemyModel(
                     enemy.getTileName(),
@@ -484,5 +538,25 @@ public class Main extends Application {
 
         enemiesLvl1.addAll(enemiesLvl2);
         return enemiesLvl1;
+    }
+
+    private List<ItemModel> getAllItemModels() {
+        List<ItemModel> result = new ArrayList<>();
+
+        Item sword = lvl1.getItemByTileName("sword");
+        Item key = lvl1.getItemByTileName("key");
+
+        ItemModel swordModel = sword != null
+            ? new ItemModel(sword.getTileName(), sword.getX(), sword.getY(), false, false)
+            : new ItemModel("sword", true, false);
+
+        ItemModel keyModel = key != null
+            ? new ItemModel(key.getTileName(), key.getX(), key.getY(), false, !lvl1.getDoorDown().isLocked())
+            : new ItemModel("key", true, !lvl1.getDoorDown().isLocked());
+
+        result.add(swordModel);
+        result.add(keyModel);
+
+        return result;
     }
 }

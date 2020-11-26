@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl.dao;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.model.EnemyModel;
 import com.codecool.dungeoncrawl.model.GameState;
+import com.codecool.dungeoncrawl.model.ItemModel;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 
 import javax.sql.DataSource;
@@ -15,11 +16,13 @@ public class GameStateDaoJdbc implements GameStateDao {
     private DataSource dataSource;
     private PlayerDao playerDao;
     private EnemyDao enemyDao;
+    private ItemDao itemDao;
 
-    public GameStateDaoJdbc (DataSource dataSource, PlayerDao playerDao, EnemyDao enemyDao) {
+    public GameStateDaoJdbc (DataSource dataSource, PlayerDao playerDao, EnemyDao enemyDao, ItemDao itemDao) {
         this.dataSource = dataSource;
         this.playerDao = playerDao;
         this.enemyDao = enemyDao;
+        this.itemDao = itemDao;
     }
 
     @Override
@@ -41,8 +44,12 @@ public class GameStateDaoJdbc implements GameStateDao {
 
             // Add enemies
             for (EnemyModel em : state.getEnemies()) {
-                System.out.println(state.getId());
                 enemyDao.add(em, state.getId());
+            }
+
+            // Add items
+            for (ItemModel im : state.getItems()) {
+                itemDao.add(im, state.getId());
             }
 
         } catch (SQLException e) {
@@ -82,7 +89,7 @@ public class GameStateDaoJdbc implements GameStateDao {
         }
         PlayerModel pm = playerDao.get(playerId);
 
-        return new GameState(currentMap, savedAt, saveName, pm, enemyDao.get(id));
+        return new GameState(currentMap, savedAt, saveName, pm, enemyDao.get(id), itemDao.get(id));
     }
 
     @Override
@@ -107,7 +114,9 @@ public class GameStateDaoJdbc implements GameStateDao {
                     savedAt,
                     saveName,
                     pm,
-                    enemyDao.get(saveId));
+                    enemyDao.get(saveId),
+                    itemDao.get(saveId)
+                );
 
                 gameState.setId(saveId);
 

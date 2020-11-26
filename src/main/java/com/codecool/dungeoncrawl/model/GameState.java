@@ -11,18 +11,22 @@ public class GameState extends BaseModel {
     private String currentMap;
     private List<String> discoveredMaps = new ArrayList<>();
     private PlayerModel player;
-
-
-
+    private List<ItemModel> items;
     private List<EnemyModel> enemies;
     private String saveName;
 
-    public GameState(String currentMap, Date savedAt, String saveName, PlayerModel player, List<EnemyModel> enemyModels) {
+    public GameState(String currentMap,
+                     Date savedAt,
+                     String saveName,
+                     PlayerModel player,
+                     List<EnemyModel> enemyModels,
+                     List<ItemModel> items) {
         this.currentMap = currentMap;
         this.savedAt = savedAt;
         this.player = player;
         this.saveName = saveName;
         this.enemies = enemyModels;
+        this.items = items;
     }
 
     public String getSaveName() {
@@ -67,5 +71,13 @@ public class GameState extends BaseModel {
 
     public List<EnemyModel> getEnemies() {
         return enemies;
+    }
+
+    public List<ItemModel> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemModel> items) {
+        this.items = items;
     }
 }

@@ -2,6 +2,10 @@ package com.codecool.dungeoncrawl.logic;
 
 import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.logic.items.DoorDown;
+import com.codecool.dungeoncrawl.logic.items.Item;
+import com.codecool.dungeoncrawl.logic.items.Key;
+import com.codecool.dungeoncrawl.logic.items.Sword;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +52,6 @@ public class GameMap {
                 }
             }
         }
-
         return enemies;
     }
 
@@ -74,8 +77,80 @@ public class GameMap {
                 if (!(cells[x][y].getActor() instanceof Player)) {
                     cells[x][y].setActor(null);
                 }
+            }
+        }
+    }
+
+    public Item getItemByTileName(String tileName) {
+        for (Cell[] row : cells) {
+            for (Cell c : row) {
+                if (c.getItem() != null) {
+                    if (c.getItem().getTileName().equals(tileName)) {
+                        return c.getItem();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public List<Item> getPickableItems() {
+        List<Item> result = new ArrayList<>();
+
+        for (Cell[] row: cells) {
+            for (Cell c : row) {
+
+                if (c.getItem() != null) {
+                    if (c.getItem().isPickable()) {
+                        result.add(c.getItem());
+                    }
+                }
 
             }
         }
+
+        return result;
+    }
+
+    public boolean isPicked(Item item) {
+        for (Cell[] row: cells) {
+            for (Cell c : row) {
+
+                if (c.getItem() != null) {
+                    if (c.getItem().getTileName().equals(item.getTileName())) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public void removeItemByTileName(String tileName) {
+        for (Cell[] row : cells) {
+            for (Cell c : row) {
+                if (c.getItem() != null) {
+                    if (c.getItem().getTileName().equals(tileName)) {
+                        c.setItem(null);
+                    }
+                }
+            }
+        }
+    }
+
+    public DoorDown getDoorDown() {
+        for (Cell[] row : cells) {
+            for (Cell c : row) {
+                if (c.getItem() != null) {
+                    if (c.getItem().getTileName().equals("doorDown")) {
+                        return (DoorDown) c.getItem();
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

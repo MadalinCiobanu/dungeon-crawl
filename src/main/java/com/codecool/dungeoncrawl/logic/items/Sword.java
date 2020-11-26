@@ -12,6 +12,11 @@ public class Sword extends Item {
     }
 
     @Override
+    public boolean isPickable() {
+        return true;
+    }
+
+    @Override
     public String getTileName() {
         return "sword";
     }

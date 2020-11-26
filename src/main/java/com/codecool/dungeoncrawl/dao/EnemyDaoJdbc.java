@@ -29,9 +29,11 @@ public class EnemyDaoJdbc implements EnemyDao {
             statement.setInt(4, enemyModel.getY());
             statement.setInt(5, saveId);
             statement.setInt(6, enemyModel.getLevel());
+
             statement.executeUpdate();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
+
             enemyModel.setId(resultSet.getInt(1));
         } catch (SQLException e) {
             throw new RuntimeException(e);
