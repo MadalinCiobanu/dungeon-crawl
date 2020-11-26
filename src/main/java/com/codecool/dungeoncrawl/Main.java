@@ -37,6 +37,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 //import java.awt.*;
+import java.io.*;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class Main extends Application {
     Button loadButton = new Button("Load game");
     private final double FONT_SIZE = 19.0;
     GameDatabaseManager dbManager;
+    JsonHandler jsonHandler = new JsonHandler();
 
     public static void main(String[] args) {
         launch(args);
@@ -349,6 +351,9 @@ public class Main extends Application {
 
         String save = new Gson().toJson(gs);
         System.out.println(save);
+
+        jsonHandler.createSaveFile(save, gs.getSaveName());
+
         dbManager.saveGame(gs);
     }
 
@@ -493,9 +498,23 @@ public class Main extends Application {
         Button loadFromFile = new Button("Select a file");
         loadFromFile.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open Resource File");
-            fileChooser.showOpenDialog(popup);
+            fileChooser.setTitle("Open Save File");
+            File file = fileChooser.showOpenDialog(popup);
+
+            if (file != null) {
+                try {
+                    InputStream inputStream = new FileInputStream(file);
+                    String savedJson = jsonHandler.readFromInputStream(inputStream);
+
+                    loadGame(new Gson().fromJson(savedJson, GameState.class));
+                    popup.close();
+
+                } catch (IOException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+            }
         });
+
         Button submit = new Button("Submit");
         submit.setOnAction(event -> {
             String selectedRow = (String) listView.getSelectionModel().getSelectedItem();
