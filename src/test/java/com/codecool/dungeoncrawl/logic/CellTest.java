@@ -23,4 +23,11 @@ class CellTest {
         cell = map.getCell(1, 2);
         assertNull(cell.getNeighbor(0, 1));
     }
-}
+
+    @Test
+    void checkGetTileNameMethod () {
+        Cell cell = map.getCell(1, 1);
+
+        assertEquals("floor", cell.getTileName());
+    }
+ }
